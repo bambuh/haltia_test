@@ -3,17 +3,16 @@ import 'dart:ffi';
 import 'dart:isolate';
 
 import 'package:ffi/ffi.dart';
-import 'package:haltia_test/utils/tracer.dart';
-import 'package:haltia_test/whisper/download_model.dart';
 import 'package:haltia_test/whisper/models/_models.dart';
 import 'package:haltia_test/whisper/models/requests/transcribe_request_dto.dart';
 import 'package:haltia_test/whisper/models/requests/version_request.dart';
 import 'package:haltia_test/whisper/models/whisper_dto.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:haltia_test/whisper/whisper_model_downloader.dart';
+import 'package:haltia_test/whisper/whisper_models.dart';
 import 'package:universal_io/io.dart';
 
-export 'download_model.dart' show WhisperModel;
 export 'models/_models.dart';
+export 'whisper_model_downloader.dart' show WhisperModel;
 
 /// Native request type
 typedef WReqNative = Pointer<Utf8> Function(Pointer<Utf8> body);
@@ -25,18 +24,10 @@ class Whisper {
   static const tag = 'Whisper';
 
   /// [model] is required
-  /// [modelDir] is path where downloaded model will be stored.
-  /// Default to library directory
-  const Whisper({
-    required this.model,
-    this.modelDir,
-  });
+  const Whisper({required this.model});
 
   /// model used for transcription
   final WhisperModel model;
-
-  /// override of model storage path
-  final String? modelDir;
 
   DynamicLibrary _openLib() {
     if (Platform.isIOS) {
@@ -46,26 +37,9 @@ class Whisper {
     }
   }
 
-  Future<String> _getModelDir() async {
-    if (modelDir != null) {
-      return modelDir!;
-    }
-    final Directory libraryDirectory =
-        Platform.isAndroid ? await getApplicationSupportDirectory() : await getLibraryDirectory();
-    return libraryDirectory.path;
-  }
-
   Future<void> initModel() async {
     _initializationFuture ??= Future(() async {
-      final String modelDir = await _getModelDir();
-      final File modelFile = File(model.getBinPath(modelDir));
-      final bool isModelExist = modelFile.existsSync();
-      if (isModelExist) {
-        trace(tag, 'Use existing model ${model.modelName}');
-        return;
-      }
-
-      await model.downloadModel(destinationDir: modelDir);
+      await model.downloadModel();
     });
     await _initializationFuture;
   }
@@ -100,11 +74,10 @@ class Whisper {
     final TranscribeRequest req = transcribeRequest.copyWith(
       audio: transcribeRequest.audio,
     );
-    final String modelDir = await _getModelDir();
     final Map<String, dynamic> result = await _request(
       whisperRequest: TranscribeRequestDto.fromTranscribeRequest(
         req,
-        model.getBinPath(modelDir),
+        await model.getBinPath(),
       ),
     );
     if (result['text'] == null) {

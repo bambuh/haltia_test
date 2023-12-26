@@ -1,6 +1,7 @@
 import 'package:haltia_test/transcribe/transcribe_service.dart';
 import 'package:haltia_test/utils/tracer.dart';
 import 'package:haltia_test/whisper/whisper_flutter_plus.dart';
+import 'package:haltia_test/whisper/whisper_models.dart';
 
 class WhisperTranscribeService implements TranscribeService {
   static const tag = 'WhisperTranscribeService';
