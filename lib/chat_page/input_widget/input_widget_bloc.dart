@@ -31,7 +31,7 @@ final class InputWidgetBloc extends ExtendedBloc<InputWidgetEvent, InputWidgetSt
 
           await _recorder.start(
             const RecordConfig(
-              encoder: AudioEncoder.wav,
+              encoder: AudioEncoder.pcm16bits,
               sampleRate: 16000,
             ),
             path: '${appDirectory.path}/myFile.wav',
@@ -39,11 +39,16 @@ final class InputWidgetBloc extends ExtendedBloc<InputWidgetEvent, InputWidgetSt
           emit(InputWidgetStateRecording());
           break;
         case InputWidgetStateRecording _:
-          emit(InputWidgetStateTranscribing());
-          _transcribeService.transcribe('filePath').then((value) {
-            command(InputWidgetCommandUpdateTextValue(value));
-            add(InputWidgetEventTranscribed());
-          });
+          final audioFilePath = await _recorder.stop();
+          if (audioFilePath != null) {
+            emit(InputWidgetStateTranscribing());
+            _transcribeService.transcribe(audioFilePath).then((value) {
+              command(InputWidgetCommandUpdateTextValue(value));
+              add(InputWidgetEventTranscribed());
+            });
+          } else {
+            emit(InputWidgetStateIdle());
+          }
           break;
         case InputWidgetStateTranscribing _:
           break;

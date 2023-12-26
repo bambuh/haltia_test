@@ -7,7 +7,7 @@ import 'package:haltia_test/repositories/messages_repository.dart';
 import 'package:haltia_test/repositories/user_repository.dart';
 import 'package:haltia_test/storage/messages_drift_storage.dart';
 import 'package:haltia_test/transcribe/transcribe_service.dart';
-import 'package:haltia_test/transcribe/transcribe_service_mock.dart';
+import 'package:haltia_test/transcribe/whisper_transcribe_service.dart';
 
 void main() {
   runApp(const MainApp());
@@ -28,7 +28,7 @@ class MainApp extends StatelessWidget {
             ),
           ),
           RepositoryProvider<TranscribeService>(
-            create: (context) => TranscribeServiceMock(),
+            create: (context) => WhisperTranscribeService(),
           ),
           RepositoryProvider(
             create: (context) => UserRepository(
