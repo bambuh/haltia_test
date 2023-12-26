@@ -12,7 +12,7 @@ import 'package:haltia_test/whisper/whisper_models.dart';
 import 'package:universal_io/io.dart';
 
 export 'models/_models.dart';
-export 'whisper_model_downloader.dart' show WhisperModel;
+export 'whisper_model_downloader.dart';
 
 /// Native request type
 typedef WReqNative = Pointer<Utf8> Function(Pointer<Utf8> body);
@@ -38,9 +38,7 @@ class Whisper {
   }
 
   Future<void> initModel() async {
-    _initializationFuture ??= Future(() async {
-      await model.downloadModel();
-    });
+    _initializationFuture ??= model.downloadModel();
     await _initializationFuture;
   }
 

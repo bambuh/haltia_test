@@ -1,6 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:haltia_test/chat_page/input_widget/input_widget_bloc.dart';
+import 'package:haltia_test/chat_page/input_widget/input_widget_commands.dart';
+import 'package:haltia_test/chat_page/input_widget/input_widget_events.dart';
+import 'package:haltia_test/chat_page/input_widget/input_widget_states.dart';
 import 'package:haltia_test/utils/extended_bloc_builder.dart';
 import 'package:haltia_test/utils/inkwell.dart';
 
@@ -35,10 +39,10 @@ class _InputWidgetState extends State<InputWidget> {
                     controller: _controller,
                     onChanged: (value) =>
                         context.read<InputWidgetBloc>().add(InputWidgetEventInputChanged(_controller.text)),
-                    enabled: state is InputWidgetStateIdle || state is InputWidgetStateReadyToSend,
+                    enabled: state.inputEnabled,
                     maxLines: null,
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 16,
                       height: 1.33,
                       fontWeight: FontWeight.w400,
                       fontStyle: FontStyle.normal,
@@ -59,13 +63,17 @@ class _InputWidgetState extends State<InputWidget> {
                 MInkWell(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: 100,
-                  onTap: () => context.read<InputWidgetBloc>().add(InputWidgetEventButtonPressed(_controller.text)),
+                  onTap: switch (state) {
+                    InputWidgetStateIdle _ => () =>
+                        context.read<InputWidgetBloc>().add(InputWidgetEventRecordPressed()),
+                    InputWidgetStateRecording _ => () =>
+                        context.read<InputWidgetBloc>().add(InputWidgetEventStopRecordPressed()),
+                    InputWidgetStateTranscribing _ => null,
+                    InputWidgetStateReadyToSend _ => () =>
+                        context.read<InputWidgetBloc>().add(InputWidgetEventSendPressed(_controller.text)),
+                  },
                   padding: const EdgeInsets.all(16),
-                  child: Icon(
-                    state.icon,
-                    color: Colors.white,
-                    size: 24,
-                  ),
+                  child: state.buttonIcon,
                 ),
               ],
             );
@@ -81,13 +89,40 @@ class _InputWidgetState extends State<InputWidget> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }
 
 extension _ on InputWidgetState {
-  IconData get icon => switch (this) {
-        InputWidgetStateIdle _ => Icons.mic,
-        InputWidgetStateRecording _ => Icons.stop_circle,
-        InputWidgetStateTranscribing _ => Icons.settings,
-        InputWidgetStateReadyToSend _ => Icons.send,
+  Widget get buttonIcon => switch (this) {
+        InputWidgetStateIdle _ => const Icon(
+            Icons.mic,
+            color: Colors.white,
+            size: 24,
+          ),
+        InputWidgetStateRecording _ => const Icon(
+            Icons.stop,
+            color: Colors.white,
+            size: 24,
+          ),
+        InputWidgetStateTranscribing _ => const CupertinoActivityIndicator(
+            color: Colors.white,
+            radius: 12,
+          ),
+        InputWidgetStateReadyToSend _ => const Icon(
+            Icons.send,
+            color: Colors.white,
+            size: 24,
+          ),
+      };
+
+  bool get inputEnabled => switch (this) {
+        InputWidgetStateIdle _ => true,
+        InputWidgetStateReadyToSend _ => true,
+        _ => false,
       };
 }

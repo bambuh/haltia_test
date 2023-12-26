@@ -32,13 +32,14 @@ extension WhisperModelDownloader on WhisperModel {
 
     try {
       if (File(binDestinationPath).existsSync()) {
-        trace(tag, 'Using already downloaded $_binFileName');
-      } else {
-        await _downloadFile(
-          uri: binUri,
-          destinationPath: binDestinationPath,
-        );
+        trace(tag, 'Using already downloaded model');
+        return;
       }
+
+      await _downloadFile(
+        uri: binUri,
+        destinationPath: binDestinationPath,
+      );
 
       File coreMLZipFile = await _downloadFile(
         uri: coreMLUri,
