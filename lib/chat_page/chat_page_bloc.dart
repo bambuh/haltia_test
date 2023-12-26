@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:haltia_test/chat_page/chat_page_events.dart';
+import 'package:haltia_test/chat_page/chat_page_states.dart';
 import 'package:haltia_test/repositories/messages_repository.dart';
 
 final class ChatPageBloc extends Bloc<ChatPageEvent, ChatPageState> {
@@ -19,8 +20,8 @@ final class ChatPageBloc extends Bloc<ChatPageEvent, ChatPageState> {
   }
 
   Future<void> _initializeStorage() async {
-    _messagesSubscription = _repository.messages.listen((mewMessagesList) {
-      add(ChatPageEventMessagesUpdated(mewMessagesList));
+    _messagesSubscription = _repository.messages.listen((newMessagesList) {
+      add(ChatPageEventMessagesUpdated(newMessagesList));
     });
     await _repository.initialize();
   }
@@ -30,14 +31,4 @@ final class ChatPageBloc extends Bloc<ChatPageEvent, ChatPageState> {
     _messagesSubscription?.cancel();
     return super.close();
   }
-}
-
-sealed class ChatPageState {}
-
-final class ChatPageStateLoading implements ChatPageState {}
-
-final class ChatPageStateReady implements ChatPageState {
-  List<types.TextMessage> messages;
-
-  ChatPageStateReady(this.messages);
 }

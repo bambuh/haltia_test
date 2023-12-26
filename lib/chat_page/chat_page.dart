@@ -1,14 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:haltia_test/chat_page/chat_page_bloc.dart';
+import 'package:haltia_test/chat_page/chat_page_states.dart';
 import 'package:haltia_test/chat_page/input_widget/input_widget.dart';
 import 'package:haltia_test/chat_page/input_widget/input_widget_bloc.dart';
-import 'package:haltia_test/repositories/user_repository.dart';
 
 final class ChatPage extends StatelessWidget {
-  const ChatPage({super.key});
+  final types.User user;
+
+  const ChatPage({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ final class ChatPage extends StatelessWidget {
                 onSendPressed: (_) {},
                 showUserAvatars: true,
                 showUserNames: true,
-                user: context.read<UserRepository>().user,
+                user: user,
               ),
           };
         },

@@ -1,7 +1,7 @@
-import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:haltia_test/models/user.dart';
 
 class UserRepository {
-  final types.User user;
+  final User user;
 
   UserRepository({required this.user});
 }

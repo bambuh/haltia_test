@@ -26,9 +26,10 @@ final class MessagesDriftStorage implements Storage<types.TextMessage> {
   }
 
   @override
-  Future<types.TextMessage> getById(String id) {
-    // TODO: implement getById
-    throw UnimplementedError();
+  Future<types.TextMessage> getById(String id) async {
+    DriftMessage driftMessage =
+        await (database.select(database.driftMessages)..where((t) => t.id.equals(id))).getSingle();
+    return MessageConverter.fromDrift(driftMessage);
   }
 
   @override

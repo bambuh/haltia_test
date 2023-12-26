@@ -5,3 +5,9 @@ final class InputWidgetCommandUpdateTextValue implements InputWidgetCommand {
 
   InputWidgetCommandUpdateTextValue(this.newValue);
 }
+
+final class InputWidgetCommandShowError implements InputWidgetCommand {
+  final Object error;
+
+  InputWidgetCommandShowError(this.error);
+}

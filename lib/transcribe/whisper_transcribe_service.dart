@@ -33,7 +33,7 @@ class WhisperTranscribeService implements TranscribeService {
       return transcription.text;
     } catch (e) {
       trace(tag, e.toString(), level: TraceLevel.error);
-      return '';
+      rethrow;
     }
   }
 }

@@ -83,6 +83,13 @@ class _InputWidgetState extends State<InputWidget> {
               case InputWidgetCommandUpdateTextValue _:
                 _controller.value = TextEditingValue(text: command.newValue);
                 break;
+              case InputWidgetCommandShowError(:final error):
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(error.toString()),
+                    backgroundColor: Colors.red[500],
+                  ),
+                );
             }
           },
         ),
@@ -97,6 +104,7 @@ class _InputWidgetState extends State<InputWidget> {
   }
 }
 
+// ignore: camel_case_extensions
 extension _ on InputWidgetState {
   Widget get buttonIcon => switch (this) {
         InputWidgetStateIdle _ => const Icon(
