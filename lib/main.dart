@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:haltia_test/chat_page/chat_page.dart';
 import 'package:haltia_test/chat_page/chat_page_bloc.dart';
 import 'package:haltia_test/chat_page/chat_user.dart';
+import 'package:haltia_test/fake_replies/fake_replies_service.dart';
 import 'package:haltia_test/models/user.dart';
 import 'package:haltia_test/repositories/messages_repository.dart';
 import 'package:haltia_test/repositories/user_repository.dart';
@@ -54,10 +55,16 @@ class MainApp extends StatelessWidget {
           )
         ],
         child: Builder(builder: (context) {
-          return BlocProvider(
-            create: (context) => ChatPageBloc(
-              messagesRepository: context.read(),
-            ),
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => ChatPageBloc(messagesRepository: context.read()),
+              ),
+              BlocProvider(
+                create: (context) => FakeRepliesService(messagesRepository: context.read()),
+                lazy: false,
+              ),
+            ],
             child: ChatPage(user: context.read<UserRepository>().user.chatUser),
           );
         }),
