@@ -51,6 +51,7 @@ final class InputWidgetBloc extends ExtendedBloc<InputWidgetEvent, InputWidgetSt
         emit(InputWidgetStateRecording());
       } catch (e) {
         addError(e);
+        emit(InputWidgetStateIdle());
       }
     });
     on<InputWidgetEventStopRecordPressed>((event, emit) async {
@@ -73,6 +74,7 @@ final class InputWidgetBloc extends ExtendedBloc<InputWidgetEvent, InputWidgetSt
         }
       } catch (e) {
         addError(e);
+        emit(InputWidgetStateIdle());
       }
     });
     on<InputWidgetEventSendPressed>((event, emit) {
